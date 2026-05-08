@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="https://www.favicon.cc/?action=icon&file_id=1017955" type="image/x-icon">
+    <link rel="icon" href="https://www.favicon.cc/?action=icon&file_id=1017955" type="image/x-icon">
+    <title>Калькулятор моделей</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: rgb(144, 238, 144);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            width: 100%;
+            height: 85px;
+            background-color: #32CD32;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-stats {
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #32CD32;
+            color: #333;
+            position: relative;
+        }
+
+        .search-container {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 200px;
+            padding: 10px 15px;
+            border: 2px solid #32CD32;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 8px rgba(50, 205, 50, 0.3);
+            width: 250px;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .sum-display {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        #totalSum {
+            color: #228B22;
+            font-size: 28px;
+        }
+
+        .bonus-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .bonus-btn {
+            padding: 10px 16px;
+            border: 2px solid #32CD32;
+            background-color: white;
+            color: #32CD32;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 70px;
+        }
+
+        .bonus-btn:hover {
+            background-color: #32CD32;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .bonus-btn.active {
+            background-color: #32CD32;
+            color: white;
+        }
+
+        .bonus-btn:active {
+            transform: scale(0.98);
+        }
+
+        .final-sum {
+            font-size: 18px;
+            color: #228B22;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .reset-btn {
+            padding: 8px 12px;
+            margin-top: 10px;
+            background-color: #228B22;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background-color: #1a6b1a;
+        }
+
+        .content {
+            flex: 1;
+            width: 90%;
+            max-width: 1400px;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .buttons-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            background-color: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .item:hover {
+            border-color: #32CD32;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .item.hidden {
+            display: none;
+        }
+
+        .item-name {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.3;
+        }
+
+        .price {
+            font-size: 14px;
+            color: #228B22;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 6px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .btn-control {
+            width: 35px;
+            height: 35px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            color: #333;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn-control:hover {
+            background-color: #32CD32;
+            color: white;
+            border-color: #32CD32;
+        }
+
+        .btn-control:active {
+            transform: scale(0.95);
+        }
+
+        .quantity {
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            min-width: 45px;
+        }
+
+        footer {
+            width: 100%;
+            background-color: #32CD32;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        footer a {
+            display: inline-block;
+            margin: 10px 5px;
+        }
+
+        footer img {
+            width: 40px;
+            height: 40px;
+            transition: transform 0.2s;
+        }
+
+        footer img:hover {
+            transform: scale(1.2);
+        }
+
+        footer div {
+            margin: 10px 0;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1024px) {
+            .buttons-container {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 12px;
+            }
+
+            .search-input {
+                width: 150px;
+            }
+
+            .search-input:focus {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .buttons-container {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+                height: 70px;
+            }
+
+            .item {
+                padding: 8px;
+            }
+
+            .bonus-buttons {
+                gap: 8px;
+            }
+
+            .bonus-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+                min-width: 60px;
+            }
+
+            .search-container {
+                position: static;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+
+            .search-input {
+                width: 180px;
+            }
+
+            .search-input:focus {
+                width: 220px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .buttons-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            h1 {
+                font-size: 18px;
+                height: 60px;
+            }
+
+            .header-stats {
+                padding: 15px;
+            }
+
+            .sum-display {
+                font-size: 16px;
+            }
+
+            #totalSum {
+                font-size: 22px;
+            }
+
+            .bonus-buttons {
+                gap: 6px;
+            }
+
+            .bonus-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+                min-width: 55px;
+            }
+
+            .search-container {
+                position: static;
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+
+            .search-input {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .search-input:focus {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Калькулятор моделей</h1>
+
+    <div class="header-stats">
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Поиск моделей...">
+        </div>
+
+        <div class="sum-display">
+            Базовая сумма: <span id="totalSum">0</span> руб.
+        </div>
+
+        <div class="bonus-buttons">
+            <button class="bonus-btn" data-bonus="0">Без %</button>
+            <button class="bonus-btn" data-bonus="5">+5%</button>
+            <button class="bonus-btn" data-bonus="10">+10%</button>
+            <button class="bonus-btn" data-bonus="15">+15%</button>
+            <button class="bonus-btn" data-bonus="20">+20%</button>
+        </div>
+
+        <div class="final-sum">
+            Итого: <span id="finalSum">0</span> руб.
+        </div>
+
+        <button class="reset-btn" id="resetBtn">Очистить</button>
+    </div>
+
+    <div class="content">
+        <div class="buttons-container" id="buttonsContainer"></div>
+    </div>
+
+    <footer>
+        <div><strong>Создатель: Kyltest12</strong></div>
+        <div>
+            Связь:
+            <a href="https://steamcommunity.com/id/kyltest12/" title="Steam">
+                <img src="https://img.icons8.com/?size=100&id=bAueu1nRM1E2&format=png&color=000000" alt="Steam">
+            </a>
+        </div>
+        <div>Телеграм - @kyltest12</div>
+    </footer>
+
+    <script>
+        const totalDisplay = document.getElementById('totalSum');
+        const finalDisplay = document.getElementById('finalSum');
+        const bonusButtons = document.querySelectorAll('.bonus-btn');
+        const resetBtn = document.getElementById('resetBtn');
+        const searchInput = document.getElementById('searchInput');
+
+        let totalSum = 0;
+        let currentBonus = 0;
+
+        // Данные сигарет
+        const cigarettes = [
+            { name: 'Модель Ахуенная', price: 2500 },
+            { name: 'Модель Заебатая', price: 3500 },
+            { name: 'Модель Наипиздейшая', price: 5000 },
+            { name: 'Модель ну и хуйня', price: 1700 },
+            { name: 'Модель самая крутая', price: 6000 }
+        ];
+
+        function createButton(cigarette) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item';
+            itemDiv.dataset.cigaretteName = cigarette.name.toLowerCase();
+
+            // Название сигареты
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'item-name';
+            nameDiv.textContent = cigarette.name;
+            itemDiv.appendChild(nameDiv);
+
+            // Цена
+            const priceDiv = document.createElement('div');
+            priceDiv.className = 'price';
+            priceDiv.textContent = cigarette.price + ' Р.';
+            itemDiv.appendChild(priceDiv);
+
+            // Элементы управления
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'controls';
+
+            const buttonGroup = document.createElement('div');
+            buttonGroup.className = 'button-group';
+
+            const subBtn = document.createElement('button');
+            subBtn.className = 'btn-control';
+            subBtn.textContent = '−';
+
+            const quantitySpan = document.createElement('div');
+            quantitySpan.className = 'quantity';
+            quantitySpan.textContent = '0';
+
+            const addBtn = document.createElement('button');
+            addBtn.className = 'btn-control';
+            addBtn.textContent = '+';
+
+            // Обработчики событий
+            addBtn.addEventListener('click', () => {
+                let currentQty = parseInt(quantitySpan.textContent);
+                currentQty++;
+                quantitySpan.textContent = currentQty;
+                totalSum += cigarette.price;
+                updateTotals();
+            });
+
+            subBtn.addEventListener('click', () => {
+                let currentQty = parseInt(quantitySpan.textContent);
+                if (currentQty > 0) {
+                    currentQty--;
+                    quantitySpan.textContent = currentQty;
+                    totalSum -= cigarette.price;
+                    updateTotals();
+                }
+            });
+
+            buttonGroup.appendChild(subBtn);
+            buttonGroup.appendChild(quantitySpan);
+            buttonGroup.appendChild(addBtn);
+
+            controlsDiv.appendChild(buttonGroup);
+            itemDiv.appendChild(controlsDiv);
+
+            document.getElementById('buttonsContainer').appendChild(itemDiv);
+        }
+
+        function updateTotals() {
+            totalDisplay.textContent = totalSum.toLocaleString('ru-RU');
+            const finalSum = Math.round(totalSum * (1 + currentBonus / 100));
+            finalDisplay.textContent = finalSum.toLocaleString('ru-RU');
+        }
+
+        // Функция поиска
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const items = document.querySelectorAll('.item');
+
+            items.forEach(item => {
+                const cigaretteName = item.dataset.cigaretteName;
+                if (searchTerm === '' || cigaretteName.includes(searchTerm)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        });
+
+        // Обработчики бонусных кнопок
+        bonusButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                bonusButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentBonus = parseInt(btn.dataset.bonus);
+                updateTotals();
+            });
+        });
+
+        // Обработчик кнопки очистки
+        resetBtn.addEventListener('click', () => {
+            totalSum = 0;
+            currentBonus = 0;
+            bonusButtons.forEach(b => b.classList.remove('active'));
+            bonusButtons[0].classList.add('active');
+            
+            const quantityElements = document.querySelectorAll('.quantity');
+            quantityElements.forEach(el => el.textContent = '0');
+            
+            searchInput.value = '';
+            
+            const items = document.querySelectorAll('.item');
+            items.forEach(item => item.classList.remove('hidden'));
+            
+            updateTotals();
+        });
+
+        // Инициализация - создаём все сигареты
+        cigarettes.forEach(cigarette => createButton(cigarette));
+        
+        // Устанавливаем кнопку "Без %" активной по умолчанию
+        bonusButtons[0].classList.add('active');
+    </script>
+</body>
+
+</html>
